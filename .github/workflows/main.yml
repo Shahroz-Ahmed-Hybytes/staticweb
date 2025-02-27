@@ -18,9 +18,9 @@ jobs:
           echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" | tr -d '\r' > github.pem
           chmod 400 github.pem  # Correct permissions
 
-      - name: Copy files to EC2 using SCP
+      - name: Copy files to EC2 using SCP (Excluding github.pem)
         run: |
-          scp -o StrictHostKeyChecking=no -i github.pem -r * ubuntu@${{ secrets.EC2_HOST }}:/var/www/html/
+          scp -o StrictHostKeyChecking=no -i github.pem -r --exclude='github.pem' * ubuntu@${{ secrets.EC2_HOST }}:/var/www/html/
 
       - name: Restart Nginx on EC2
         run: |
