@@ -1,29 +1,68 @@
-name: Deploy Static Website to EC2
+name: CI/CD Pipeline
 
 on:
   push:
     branches:
-      - main
+      - Development
+  workflow_dispatch:
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout Repository
+      - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Create SSH Key and Set Permissions
-        run: |
-          echo -e "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > github.pem
-          chmod 400 github.pem  # Ensure correct permissions
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 16.x
 
-      - name: Copy files to EC2 using SCP
-        run: |
-          scp -o StrictHostKeyChecking=no -i github.pem -r * ubuntu@${{ secrets.EC2_HOST }}:/var/www/html/
+      - name: Install Dependencies
+        run: npm install
 
-      - name: Restart Nginx on EC2
+      - name: Build
+        run: npm run build --if-present
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifact-${{ github.sha }}
+          path: build/
+          retention-days: 30
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifact-${{ github.sha }}
+          path: build/
+
+      - name: Set SSH Permissions
         run: |
-          ssh -o StrictHostKeyChecking=no -i github.pem ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
+          echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > private_key.pem
+          chmod 600 private_key.pem
+
+      - name: Copy Build to Remote Server
+        run: |
+          scp -i private_key.pem -r build/* ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/app
+
+      - name: Restart Application with PM2
+        run: |
+          ssh -i private_key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+            cd /home/ubuntu/app
+            pm2 restart app
+            pm2 status
+          EOF
+
+      - name: Restart Nginx
+        run: |
+          ssh -i private_key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
             sudo systemctl restart nginx
           EOF
