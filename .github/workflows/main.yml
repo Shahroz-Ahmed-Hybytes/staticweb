@@ -15,12 +15,12 @@ jobs:
 
       - name: Create SSH Key and Set Permissions
         run: |
-          echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" | tr -d '\r' > github.pem
-          chmod 400 github.pem  # Correct permissions
+          echo -e "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > github.pem
+          chmod 400 github.pem  # Ensure correct permissions
 
-      - name: Copy files to EC2 using SCP (Excluding github.pem)
+      - name: Copy files to EC2 using SCP
         run: |
-          scp -o StrictHostKeyChecking=no -i github.pem -r --exclude='github.pem' * ubuntu@${{ secrets.EC2_HOST }}:/var/www/html/
+          scp -o StrictHostKeyChecking=no -i github.pem -r * ubuntu@${{ secrets.EC2_HOST }}:/var/www/html/
 
       - name: Restart Nginx on EC2
         run: |
