@@ -3,33 +3,27 @@ name: Deploy Static Website to EC2
 on:
   push:
     branches:
-      - main  # Runs on every push to the 'main' branch
-      
+      - main
+
 jobs:
   deploy:
-    runs-on: ubuntu-latest  # Runs this job on the latest Ubuntu runner
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4  # Fetches the latest code from GitHub
+        uses: actions/checkout@v4
 
-      - name: Create GitHub.pem and Set Permissions
+      - name: Create SSH Key and Set Permissions
         run: |
-          echo "$PRIVATE_KEY" > github.pem  # Create the private key file
-          chmod 400 github.pem  # Secure the key file
+          echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" | tr -d '\r' > github.pem
+          chmod 400 github.pem  # Correct permissions
 
       - name: Copy files to EC2 using SCP
         run: |
-          scp -o StrictHostKeyChecking=no -i github.pem -r * ubuntu@$EC2_HOST:/var/www/html/
-        env:
-          PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-          EC2_HOST: ${{ secrets.EC2_HOST }}
+          scp -o StrictHostKeyChecking=no -i github.pem -r * ubuntu@${{ secrets.EC2_HOST }}:/var/www/html/
 
       - name: Restart Nginx on EC2
         run: |
-          ssh -o StrictHostKeyChecking=no -i github.pem ubuntu@$EC2_HOST << 'EOF'
+          ssh -o StrictHostKeyChecking=no -i github.pem ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
             sudo systemctl restart nginx
           EOF
-        env:
-          PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-          EC2_HOST: ${{ secrets.EC2_HOST }}
