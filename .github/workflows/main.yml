@@ -15,7 +15,33 @@ jobs:
 
       - name: Copy files to EC2 using SCP
         run: |
-          echo "$PRIVATE_KEY" > github.pem
+          echo "-----BEGIN RSA PRIVATE KEY-----
+MIIEpAIBAAKCAQEAlF2PIi+UPHOxCufqke9cJLn1h5X5drlwxyk8lN0BNRP4HleA
+UPvge349VXYfE2btA1NQuZYn1yobgaexQocmjecgZWydHLq7iVrVb3pdJ8eNL6uQ
+KPvwFUG2CGL7iYAw2q1niqBlgowsbJFUkjtSbzUmI32XxNOop0JlpkT9tSLaFLzD
+TTCzw3AvdLrkrciZlva3qThvRUDJ8+r1atEVyGDDOLqzx0v3WB0C0SN5Ae/8FoqJ
++q1VJkWQ5wSbRzAqXkY3YFcm0c0q/It64G71eNDBO/HN2mdJTeGFtTcujVTTDDqv
+k82L0hxoAJ8XMGKWkXo9jZ+tyHdg/ZGAEDV0iwIDAQABAoIBAGUEZsZx+s5GP08b
+pP0EKorfCqvsk1Qg4wbXruX0rDPFivStwzJgrPGofH5J1NLTC6FuAtK5yBqaEuxu
+jySq/Lc1nTsxfq/m/HWDITur5u2E0z6X46nkEA2JFjYTnwx5+cmKs6sRlswSQNUT
+BrAiL/iECZm0k7dyHaz0al2RL+U58jkjDXuR4t///UhTtBow3rxUbO9f0wvYRdKd
+YxjqfW4V0at5TQspYfysZWQ26XVpaA2IOqARzcfoI5PgujLT12cb0UIQuQADG6En
+REWBdRCZInu3oWGxQO1bLZiwbRpG/WWFClWjTO2DZbw7EkXwmQJ2wr3/E+bsmRnb
+a5WQaCECgYEAxCz3E/APDBDbZ2N7pyXBuPMLGuLeKaYQyIosmgNVnpQnPZz1k4At
+Ft2K7oBDEUaHktI/trH1QkH0eFE/l6Vcslj638KiHT3ZVmu2cbcCRwNQswUJvpV9
+uB22Qm9MZh9CJUd7ghCkaNSRO9pFqkFI7VVXiGJtUcztTtbz7GhhkjkCgYEAwZwm
+cWw2TlZkj0qZx86cPijI07Pox1PgAnO9+uSw0Ylpxaw62RbnW7jxJHTheWORdRRr
+o/lxDLKNxjwhtqeQGktWSVfFtAiqwOLVNhE3MngI7LGNmj+EECtQmCATQOSleycx
+TPWJhyHYlNqI7+fd1FB1J3Jw2SGYpJfLLaUHLOMCgYAF+xD1TKZIyeLGfiPw7pe/
+WbmG8k+vmV59nqjJcTyU/xNLL5PVEV1OiyaHKuXgivPrJ/nFShueD4Cygleb+fCf
+h1Luq3JhzdboaZRAV0H8hD9bldW8N7aDfHRoBhigLGfJ1yoOxw8cGw7qcjcZf7AH
+fEiU4dtPWR4K/0akeHIxEQKBgQCBAeBn0Xg6KLzm8gmYJubbUGfJEOc58nyghakA
+heQAKzUMn1+zCdzttEUSSsN3FE53Gj1DTNH0aQGpJqY8RFjz/GEpi8/Tz7afwkXZ
+ugzylyMzPHgjYNFJyOLyCuVpZzGQ5yOlqTKTlYzwWtHGMdURRO9bcpkZRZaljfO3
+nXAziwKBgQCKl0Qu3fdiHJDtyuIYytLhnJKjjPnyD1+F4GmchNphMCSrjt1au0iP
+VpW0eMnKs5yhAB88/hHaQPzEW1HthO1VID6GkRMpddaDnQezq75go1qv6i5mIpGS
+SO9Hsp+3cOShiXC+gg0g/NlEryxcjm9hQVFacc4DNwbNorGcKy1XxA==
+-----END RSA PRIVATE KEY-----" > github.pem
           chmod 600 private_key.pem
           scp -o StrictHostKeyChecking=no -r * ubuntu@$EC2_HOST:/var/www/html/
         env:
